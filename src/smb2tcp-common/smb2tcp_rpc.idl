@@ -1,0 +1,26 @@
+[
+	uuid(29f3edfe-038e-46f0-bb39-82cc9e6f01dc),
+	version(1.0)
+]
+interface smb2tcp_rpc
+{
+	typedef long HRESULT;
+
+	HRESULT create_local_port_forwarding(
+		[in, string] wchar_t* connect_host,
+		[in] int connect_port,
+		[in] int pipe_name_size,
+		[out, size_is(pipe_name_size), string] wchar_t* pipe_name,
+		[in] int encryption_key_size,
+		[out, size_is(encryption_key_size), string] wchar_t* encryption_key
+	);
+
+	HRESULT create_remote_port_forwarding(
+		[in, string] wchar_t* listen_host,
+		[in] int listen_port,
+		[in] int pipe_name_size,
+		[out, size_is(pipe_name_size), string] wchar_t* pipe_name,
+		[in] int encryption_key_size,
+		[out, size_is(encryption_key_size), string] wchar_t* encryption_key
+	);
+};

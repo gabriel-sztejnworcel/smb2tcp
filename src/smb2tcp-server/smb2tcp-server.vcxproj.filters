@@ -18,8 +18,16 @@
     <ClCompile Include="smb2tcp-server.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="rpc_server.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="rpc_server.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

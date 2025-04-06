@@ -39,3 +39,6 @@ src/smb2tcp-common/x64/
 src/smb2tcp-server/x64/
 src/smb2tcp-tunnel/x64/
 src/x64/
+src/smb2tcp-common/smb2tcp_rpc.h
+src/smb2tcp-common/smb2tcp_rpc_c.c
+src/smb2tcp-common/smb2tcp_rpc_s.c

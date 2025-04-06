@@ -33,6 +33,12 @@
     <ClCompile Include="channel_client.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="serverstub.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="clientstub.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tcp.h">
@@ -56,5 +62,14 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="$(MSBuildThisFileDirectory)..\..\natvis\wil.natvis" />
+    <Natvis Include="$(MSBuildThisFileDirectory)..\..\natvis\wil.natstepfilter" />
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="smb2tcp_rpc.idl">
+      <Filter>Source Files</Filter>
+    </Midl>
   </ItemGroup>
 </Project>
