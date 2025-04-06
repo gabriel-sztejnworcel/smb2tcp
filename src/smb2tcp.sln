@@ -1,0 +1,61 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35013.160
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "smb2tcp-server", "smb2tcp-server\smb2tcp-server.vcxproj", "{73AB1C9B-CE8E-46B9-886E-505BDC704A61}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "smb2tcp-client", "smb2tcp-client\smb2tcp-client.vcxproj", "{14736FBB-3D2E-468D-AEAA-7EE720F226AE}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "smb2tcp-tunnel", "smb2tcp-tunnel\smb2tcp-tunnel.vcxproj", "{32B3CCFB-BEB3-4AEF-9C65-26BB559B935C}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "smb2tcp-common", "smb2tcp-common\smb2tcp-common.vcxproj", "{2A0F0867-B825-45E0-BE89-5A2F72198B17}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{73AB1C9B-CE8E-46B9-886E-505BDC704A61}.Debug|x64.ActiveCfg = Debug|x64
+		{73AB1C9B-CE8E-46B9-886E-505BDC704A61}.Debug|x64.Build.0 = Debug|x64
+		{73AB1C9B-CE8E-46B9-886E-505BDC704A61}.Debug|x86.ActiveCfg = Debug|Win32
+		{73AB1C9B-CE8E-46B9-886E-505BDC704A61}.Debug|x86.Build.0 = Debug|Win32
+		{73AB1C9B-CE8E-46B9-886E-505BDC704A61}.Release|x64.ActiveCfg = Release|x64
+		{73AB1C9B-CE8E-46B9-886E-505BDC704A61}.Release|x64.Build.0 = Release|x64
+		{73AB1C9B-CE8E-46B9-886E-505BDC704A61}.Release|x86.ActiveCfg = Release|Win32
+		{73AB1C9B-CE8E-46B9-886E-505BDC704A61}.Release|x86.Build.0 = Release|Win32
+		{14736FBB-3D2E-468D-AEAA-7EE720F226AE}.Debug|x64.ActiveCfg = Debug|x64
+		{14736FBB-3D2E-468D-AEAA-7EE720F226AE}.Debug|x64.Build.0 = Debug|x64
+		{14736FBB-3D2E-468D-AEAA-7EE720F226AE}.Debug|x86.ActiveCfg = Debug|Win32
+		{14736FBB-3D2E-468D-AEAA-7EE720F226AE}.Debug|x86.Build.0 = Debug|Win32
+		{14736FBB-3D2E-468D-AEAA-7EE720F226AE}.Release|x64.ActiveCfg = Release|x64
+		{14736FBB-3D2E-468D-AEAA-7EE720F226AE}.Release|x64.Build.0 = Release|x64
+		{14736FBB-3D2E-468D-AEAA-7EE720F226AE}.Release|x86.ActiveCfg = Release|Win32
+		{14736FBB-3D2E-468D-AEAA-7EE720F226AE}.Release|x86.Build.0 = Release|Win32
+		{32B3CCFB-BEB3-4AEF-9C65-26BB559B935C}.Debug|x64.ActiveCfg = Debug|x64
+		{32B3CCFB-BEB3-4AEF-9C65-26BB559B935C}.Debug|x64.Build.0 = Debug|x64
+		{32B3CCFB-BEB3-4AEF-9C65-26BB559B935C}.Debug|x86.ActiveCfg = Debug|Win32
+		{32B3CCFB-BEB3-4AEF-9C65-26BB559B935C}.Debug|x86.Build.0 = Debug|Win32
+		{32B3CCFB-BEB3-4AEF-9C65-26BB559B935C}.Release|x64.ActiveCfg = Release|x64
+		{32B3CCFB-BEB3-4AEF-9C65-26BB559B935C}.Release|x64.Build.0 = Release|x64
+		{32B3CCFB-BEB3-4AEF-9C65-26BB559B935C}.Release|x86.ActiveCfg = Release|Win32
+		{32B3CCFB-BEB3-4AEF-9C65-26BB559B935C}.Release|x86.Build.0 = Release|Win32
+		{2A0F0867-B825-45E0-BE89-5A2F72198B17}.Debug|x64.ActiveCfg = Debug|x64
+		{2A0F0867-B825-45E0-BE89-5A2F72198B17}.Debug|x64.Build.0 = Debug|x64
+		{2A0F0867-B825-45E0-BE89-5A2F72198B17}.Debug|x86.ActiveCfg = Debug|Win32
+		{2A0F0867-B825-45E0-BE89-5A2F72198B17}.Debug|x86.Build.0 = Debug|Win32
+		{2A0F0867-B825-45E0-BE89-5A2F72198B17}.Release|x64.ActiveCfg = Release|x64
+		{2A0F0867-B825-45E0-BE89-5A2F72198B17}.Release|x64.Build.0 = Release|x64
+		{2A0F0867-B825-45E0-BE89-5A2F72198B17}.Release|x86.ActiveCfg = Release|Win32
+		{2A0F0867-B825-45E0-BE89-5A2F72198B17}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4170E394-46A6-4F81-8A82-221072075BCE}
+	EndGlobalSection
+EndGlobal
