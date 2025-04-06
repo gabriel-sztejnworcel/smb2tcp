@@ -42,5 +42,5 @@ void ChannelServer::create_channel(SOCKET client_socket)
 
 void ChannelServer::handle_channel_connect(TunnelMessage* message)
 {
-    throw std::runtime_error("ChannelServer::handle_channel_connect: Unexpected CONNECT message");
+    throw std::runtime_error("handle_channel_connect: Unexpected CONNECT message");
 }

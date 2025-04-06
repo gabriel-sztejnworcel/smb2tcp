@@ -16,8 +16,7 @@ HRESULT RpcClient::create_local_port_forwarding(
     /* [in] */ int pipe_name_size,
     /* [string][size_is][out] */ wchar_t* pipe_name,
     /* [in] */ int encryption_key_size,
-    /* [string][size_is][out] */ wchar_t* encryption_key
-)
+    /* [string][size_is][out] */ wchar_t* encryption_key)
 {
     HRESULT hr = S_OK;
 
@@ -79,7 +78,7 @@ void RpcClient::create_binding(const std::wstring& host)
 
     RPC_STATUS rpc_status = RPC_S_OK;
     
-    wil::unique_rpc_wstr stringBinding;
+    wil::unique_rpc_wstr string_binding;
 
     rpc_status = RpcStringBindingCompose(
         nullptr,
@@ -87,7 +86,7 @@ void RpcClient::create_binding(const std::wstring& host)
         (RPC_WSTR)host.c_str(),
         (RPC_WSTR)endpoint,
         nullptr,
-        &stringBinding);
+        &string_binding);
 
     if (rpc_status != RPC_S_OK)
     {
@@ -95,7 +94,7 @@ void RpcClient::create_binding(const std::wstring& host)
         throw std::runtime_error(msg);
     }
 
-    rpc_status = RpcBindingFromStringBinding(stringBinding.get(), &binding_handle_);
+    rpc_status = RpcBindingFromStringBinding(string_binding.get(), &binding_handle_);
 
     if (rpc_status != RPC_S_OK)
     {

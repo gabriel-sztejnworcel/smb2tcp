@@ -31,6 +31,10 @@ public:
     );
 
 private:
+    void validate_host(const wchar_t* host);
+    bool has_illegal_ip_characters(const std::wstring& ip);
+    bool has_illegal_hostname_characters(const std::wstring& hostname);
+    
     HRESULT create_pipe_name(wchar_t* pipe_name, int pipe_name_size);
 
     HRESULT run_tunnel_process(

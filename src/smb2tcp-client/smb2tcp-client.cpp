@@ -6,6 +6,7 @@
 #include <pipe.h>
 #include <channel_client.h>
 #include <channel_server.h>
+#include <wil/resource.h>
 #include <string>
 #include <vector>
 #include <iostream>
@@ -36,6 +37,9 @@ int main(int argc, char* argv[])
 
         winsock_init();
 
+        auto winsock_cleanip_scope =
+            wil::scope_exit([](){ winsock_cleanup(); });
+
         std::wstring server = str_to_wstr(args.server);
         RpcClient rpc_client(server);
         wchar_t pipe_name[PIPE_NAME_BUFFER_SIZE] = { 0 };
@@ -43,6 +47,9 @@ int main(int argc, char* argv[])
 
         if (args.mode == "local")
         {
+            printf("Creating local port forwarding: server=%S, listen_host=%s, listen_port=%s, connect_host=%s, connect_port=%s\n",
+                server.c_str(), args.listen_host.c_str(), args.listen_port.c_str(), args.connect_host.c_str(), args.connect_port.c_str());
+            
             std::wstring connect_host = str_to_wstr(args.connect_host);
 
             HRESULT hr = rpc_client.create_local_port_forwarding(
@@ -62,6 +69,9 @@ int main(int argc, char* argv[])
         }
         else if (args.mode == "remote")
         {
+            printf("Creating remote port forwarding: server=%S, listen_host=%s, listen_port=%s, connect_host=%s, connect_port=%s\n",
+                server.c_str(), args.listen_host.c_str(), args.listen_port.c_str(), args.connect_host.c_str(), args.connect_port.c_str());
+
             std::wstring listen_host = str_to_wstr(args.listen_host);
 
             HRESULT hr = rpc_client.create_remote_port_forwarding(
@@ -86,13 +96,13 @@ int main(int argc, char* argv[])
 
         if (args.mode == "local")
         {
-            ChannelServer channel(pipe, args.listen_host, args.listen_port);
-            channel.start();
+            ChannelServer channel_server(pipe, args.listen_host, args.listen_port);
+            channel_server.start();
         }
         else if (args.mode == "remote")
         {
-            ChannelClient channel(pipe, args.connect_host, args.connect_port);
-            channel.start();
+            ChannelClient channel_client(pipe, args.connect_host, args.connect_port);
+            channel_client.start();
         }
 
         exit(0);

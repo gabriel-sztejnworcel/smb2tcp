@@ -9,9 +9,9 @@ int main()
     {
         RpcServer::instance().start();
     }
-    catch (const std::exception& ex)
+    catch (const std::exception& e)
     {
-        wprintf(L"%hs\n", ex.what());
+        wprintf(L"Error: %S\n", e.what());
         exit(1);
     }
 

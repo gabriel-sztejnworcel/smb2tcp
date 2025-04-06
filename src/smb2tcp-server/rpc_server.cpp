@@ -2,6 +2,7 @@
 #include <smb2tcp_rpc.h>
 #include <iostream>
 #include <stdexcept>
+#include <regex>
 #include <Windows.h>
 
 #define PROTSEQ L"ncacn_np";
@@ -37,6 +38,8 @@ void RpcServer::start()
         throw std::runtime_error(msg);
     }
 
+    wprintf(L"Starting RPC server on %s...\n", endpoint);
+
     rpc_status = RpcServerListen(1, RPC_C_LISTEN_MAX_CALLS_DEFAULT, FALSE);
     if (rpc_status != RPC_S_OK)
     {
@@ -54,14 +57,17 @@ HRESULT RpcServer::create_local_port_forwarding(
     /* [in] */ int encryption_key_size,
     /* [string][size_is][out] */ wchar_t* encryption_key)
 {
-    wprintf(L"RpcServer::create_local_port_forwarding\n");
-
+    validate_host(connect_host);
+    
     if (FAILED(create_pipe_name(pipe_name, pipe_name_size)))
     {
         return E_FAIL;
     }
 
     std::wstring full_pipe_name = L"\\\\.\\pipe\\" + std::wstring(pipe_name);
+
+    wprintf(L"Received request to create local port forwarding: pipe_name=%s, connect_host=%s, connect_port=%d\n",
+        pipe_name, connect_host, connect_port);
 
     wcscpy_s(encryption_key, encryption_key_size, L"");
 
@@ -82,14 +88,17 @@ HRESULT RpcServer::create_remote_port_forwarding(
     /* [in] */ int encryption_key_size,
     /* [string][size_is][out] */ wchar_t* encryption_key)
 {
-    wprintf(L"RpcServer::create_remote_port_forwarding\n");
-
+    validate_host(listen_host);
+    
     if (FAILED(create_pipe_name(pipe_name, pipe_name_size)))
     {
         return E_FAIL;
     }
 
     std::wstring full_pipe_name = L"\\\\.\\pipe\\" + std::wstring(pipe_name);
+
+    wprintf(L"Received request to create remote port forwarding: pipe_name=%s, listen_host=%s, listen_port=%d\n",
+        pipe_name, listen_host, listen_port);
 
     wcscpy_s(encryption_key, encryption_key_size, L"");
 
@@ -99,6 +108,26 @@ HRESULT RpcServer::create_remote_port_forwarding(
     }
 
     return S_OK;
+}
+
+void RpcServer::validate_host(const wchar_t* host)
+{
+    if (has_illegal_ip_characters(host) || has_illegal_hostname_characters(host))
+    {
+        throw std::invalid_argument("Invalid address format");
+    }
+}
+
+bool RpcServer::has_illegal_ip_characters(const std::wstring& ip)
+{
+    const std::wregex illegal_ip_pattern(LR"([^0-9\.])");
+    return std::regex_search(ip, illegal_ip_pattern);
+}
+
+bool RpcServer::has_illegal_hostname_characters(const std::wstring& hostname)
+{
+    const std::wregex illegal_hostname_pattern(LR"([^a-zA-Z0-9\-\.])");
+    return std::regex_search(hostname, illegal_hostname_pattern);
 }
 
 HRESULT RpcServer::create_pipe_name(wchar_t* pipe_name, int pipe_name_size)
@@ -130,7 +159,6 @@ HRESULT RpcServer::run_tunnel_process(
     const std::wstring& host,
     int port)
 {
-    // TODO: Check for command injection
     std::wstring command = L"smb2tcp-tunnel.exe " + pipe_name
         + L" " + mode + L" " + host + L" " + std::to_wstring(port);
 

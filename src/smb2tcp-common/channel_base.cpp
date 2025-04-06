@@ -37,7 +37,7 @@ void ChannelBase::pipe_thread_fn()
                 break;
 
             default:
-                throw std::runtime_error("Unknown message type");
+                throw std::runtime_error("pipe_thread_fn: Unknown message type");
                 break;
             }
         }
@@ -79,11 +79,12 @@ void ChannelBase::tcp_thread_fn(SOCKET client_socket, uint32_t client_id)
             pipe_write_async_await(&pipe_write_context);
         }
     }
-    catch (std::exception& e)
+    catch (std::exception&)
     {
-        wprintf(L"Error: %S\n", e.what());
+        // Nothing, the socket will be closed.
     }
 
+    wprintf(L"Closing socket: client_id=%d\n", client_id);
     destroy_channel(client_socket, client_id, true);
 }
 
@@ -103,7 +104,7 @@ void ChannelBase::handle_channel_data(TunnelMessage* message)
     }
     catch (std::exception& e)
     {
-        wprintf(L"Error: %S\n", e.what());
+        wprintf(L"Closing socket: client_id=%d\n", message->header.client_id);
         destroy_channel(message->header.client_id, message->header.client_id, true);
     }
 }
@@ -166,7 +167,6 @@ void ChannelBase::remove_tcp_write_context(uint32_t client_id)
     auto it = tcp_write_contexts_.find(client_id);
     if (it != tcp_write_contexts_.end())
     {
-        closesocket(it->second.socket);
         tcp_write_contexts_.erase(it);
     }
 }

@@ -7,6 +7,7 @@
 #include <pipe.h>
 #include <channel_client.h>
 #include <channel_server.h>
+#include <wil/resource.h>
 
 int main(int argc, char* argv[])
 {
@@ -19,6 +20,9 @@ int main(int argc, char* argv[])
 
         winsock_init();
 
+        auto winsock_cleanip_scope =
+            wil::scope_exit([]() { winsock_cleanup(); });
+
         std::wstring pipe_name = str_to_wstr(argv[1]);
         std::string mode = argv[2];
         std::string host = argv[3];
@@ -29,19 +33,22 @@ int main(int argc, char* argv[])
             throw std::invalid_argument("Invalid mode. Use --listen or --connect.");
         }
 
+        wprintf(L"Creating tunnel server: pipe_name=%s, mode=%s, host=%s, port=%s\n",
+            pipe_name.c_str(), str_to_wstr(mode).c_str(), str_to_wstr(host).c_str(), str_to_wstr(port).c_str());
+
         HANDLE pipe = create_pipe_server(pipe_name.c_str());
         wait_for_client(pipe);
-        wprintf(L"Client connected to pipe: %s\n", pipe_name.c_str());
+        wprintf(L"Client connected\n");
 
         if (mode == "--listen")
         {
-            ChannelServer channel(pipe, host, port);
-            channel.start();
+            ChannelServer channel_server(pipe, host, port);
+            channel_server.start();
         }
         else if (mode == "--connect")
         {
-            ChannelClient channel(pipe, host, port);
-            channel.start();
+            ChannelClient channel_client(pipe, host, port);
+            channel_client.start();
         }
 
         exit(0);
