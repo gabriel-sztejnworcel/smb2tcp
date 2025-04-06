@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Windows.h>
+#include <string>
 
 class RpcServer
 {
@@ -30,4 +31,12 @@ public:
     );
 
 private:
+    HRESULT create_pipe_name(wchar_t* pipe_name, int pipe_name_size);
+
+    HRESULT run_tunnel_process(
+        const std::wstring& pipe_name,
+        const std::wstring& mode,
+        const std::wstring& host,
+        int port
+    );
 };

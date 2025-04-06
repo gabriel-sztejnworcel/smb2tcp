@@ -40,6 +40,8 @@ void wait_for_client(HANDLE pipe)
 
 HANDLE create_pipe_client(const wchar_t* pipe_name)
 {
+    wait_for_available_pipe(pipe_name, 20, 500);
+    
     wil::unique_handle pipe(CreateFile(
         pipe_name,
         GENERIC_READ | GENERIC_WRITE,
@@ -71,6 +73,22 @@ HANDLE create_pipe_client(const wchar_t* pipe_name)
     }
 
     return pipe.release();
+}
+
+void wait_for_available_pipe(const wchar_t* pipe_name, int retries, DWORD interval)
+{
+    for (int i = 0; i < retries; ++i)
+    {
+        if (!WaitNamedPipe(pipe_name, NMPWAIT_NOWAIT))
+        {
+            Sleep(interval);
+            continue;
+        }
+
+        return;
+    }
+
+    throw std::runtime_error("WaitNamedPipe failed: " + std::to_string(GetLastError()));
 }
 
 void pipe_write(PipeContext* pipe_context)

@@ -10,6 +10,9 @@
 #include <channel_server.h>
 #include "rpc_client.h"
 
+#define PIPE_NAME_BUFFER_SIZE 1024
+#define ENCRYPTION_KEY_BUFFER_SIZE 1024
+
 int main(int argc, char* argv[])
 {
     try
@@ -23,8 +26,8 @@ int main(int argc, char* argv[])
 
         std::wstring server = str_to_wstr(argv[1]);
         std::wstring mode = str_to_wstr(argv[2]);
-        std::wstring host_local = str_to_wstr(argv[3]);
-        std::wstring port_local = str_to_wstr(argv[4]);
+        std::string host_local = argv[3];
+        std::string port_local = argv[4];
         std::wstring host_server = str_to_wstr(argv[5]);
         std::wstring port_server = str_to_wstr(argv[6]);
 
@@ -34,36 +37,58 @@ int main(int argc, char* argv[])
         }
 
         RpcClient rpc_client(server);
+        wchar_t pipe_name[PIPE_NAME_BUFFER_SIZE] = { 0 };
+        wchar_t encryption_key[ENCRYPTION_KEY_BUFFER_SIZE] = { 0 };
 
         if (mode == L"--local")
         {
             HRESULT hr = rpc_client.create_local_port_forwarding(
-                (wchar_t*)host_local.c_str(),
-                std::stoi(port_local),
-                0,
-                nullptr,
-                0,
-                nullptr
+                (wchar_t*)host_server.c_str(),
+                std::stoi(port_server),
+                PIPE_NAME_BUFFER_SIZE,
+                pipe_name,
+                ENCRYPTION_KEY_BUFFER_SIZE,
+                encryption_key
             );
+
+            if (FAILED(hr))
+            {
+                std::string msg = "Failed to create local port forwarding: " + std::to_string(hr);
+                throw std::runtime_error(msg);
+            }
         }
         else if (mode == L"--remote")
         {
+            HRESULT hr = rpc_client.create_remote_port_forwarding(
+                (wchar_t*)host_server.c_str(),
+                std::stoi(port_server),
+                PIPE_NAME_BUFFER_SIZE,
+                pipe_name,
+                ENCRYPTION_KEY_BUFFER_SIZE,
+                encryption_key
+            );
 
+            if (FAILED(hr))
+            {
+                std::string msg = "Failed to create remote port forwarding: " + std::to_string(hr);
+                throw std::runtime_error(msg);
+            }
         }
 
-        //HANDLE pipe = create_pipe_client(pipe_name.c_str());
-        //wprintf(L"Connected to pipe server: %s\n", pipe_name.c_str());
+        std::wstring full_pipe_name = L"\\\\" + server + L"\\pipe\\" + std::wstring(pipe_name);
+        HANDLE pipe = create_pipe_client(full_pipe_name.c_str());
+        wprintf(L"Connected to pipe server: %s\n", full_pipe_name.c_str());
 
-        //if (mode == "--listen")
-        //{
-        //    ChannelServer channel(pipe, host, port);
-        //    channel.start();
-        //}
-        //else if (mode == "--connect")
-        //{
-        //    ChannelClient channel(pipe, host, port);
-        //    channel.start();
-        //}
+        if (mode == L"--local")
+        {
+            ChannelServer channel(pipe, host_local, port_local);
+            channel.start();
+        }
+        else if (mode == L"--remote")
+        {
+            ChannelClient channel(pipe, host_local, port_local);
+            channel.start();
+        }
 
         exit(0);
     }

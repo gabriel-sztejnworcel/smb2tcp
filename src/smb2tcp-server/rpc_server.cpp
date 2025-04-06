@@ -2,7 +2,7 @@
 #include <smb2tcp_rpc.h>
 #include <iostream>
 #include <stdexcept>
-#include <string>
+#include <Windows.h>
 
 #define PROTSEQ L"ncacn_np";
 #define ENDPOINT L"\\pipe\\smb2tcp-rpc";
@@ -55,6 +55,21 @@ HRESULT RpcServer::create_local_port_forwarding(
     /* [string][size_is][out] */ wchar_t* encryption_key)
 {
     wprintf(L"RpcServer::create_local_port_forwarding\n");
+
+    if (FAILED(create_pipe_name(pipe_name, pipe_name_size)))
+    {
+        return E_FAIL;
+    }
+
+    std::wstring full_pipe_name = L"\\\\.\\pipe\\" + std::wstring(pipe_name);
+
+    wcscpy_s(encryption_key, encryption_key_size, L"");
+
+    if (FAILED(run_tunnel_process(full_pipe_name, L"--connect", connect_host, connect_port)))
+    {
+        return E_FAIL;
+    }
+
     return S_OK;
 }
 
@@ -68,6 +83,69 @@ HRESULT RpcServer::create_remote_port_forwarding(
     /* [string][size_is][out] */ wchar_t* encryption_key)
 {
     wprintf(L"RpcServer::create_remote_port_forwarding\n");
+
+    if (FAILED(create_pipe_name(pipe_name, pipe_name_size)))
+    {
+        return E_FAIL;
+    }
+
+    std::wstring full_pipe_name = L"\\\\.\\pipe\\" + std::wstring(pipe_name);
+
+    wcscpy_s(encryption_key, encryption_key_size, L"");
+
+    if (FAILED(run_tunnel_process(full_pipe_name, L"--listen", listen_host, listen_port)))
+    {
+        return E_FAIL;
+    }
+
+    return S_OK;
+}
+
+HRESULT RpcServer::create_pipe_name(wchar_t* pipe_name, int pipe_name_size)
+{
+    if (pipe_name_size < 40)
+    {
+        return E_INVALIDARG;
+    }
+
+    GUID guid;
+    if (FAILED(CoCreateGuid(&guid)))
+    {
+        return E_FAIL;
+    }
+
+    wchar_t guidString[40];
+    if (StringFromGUID2(guid, guidString, 40) == 0)
+    {
+        return E_FAIL;
+    }
+
+    wcscpy_s(pipe_name, pipe_name_size, guidString);
+    return S_OK;
+}
+
+HRESULT RpcServer::run_tunnel_process(
+    const std::wstring& pipe_name,
+    const std::wstring& mode,
+    const std::wstring& host,
+    int port)
+{
+    // TODO: Check for command injection
+    std::wstring command = L"smb2tcp-tunnel.exe " + pipe_name
+        + L" " + mode + L" " + host + L" " + std::to_wstring(port);
+
+    STARTUPINFO si = { sizeof(STARTUPINFO) };
+    PROCESS_INFORMATION pi = { 0 };
+
+    if (!CreateProcess(nullptr, const_cast<LPWSTR>(command.c_str()), nullptr,
+        nullptr, FALSE, CREATE_NEW_CONSOLE, nullptr, nullptr, &si, &pi))
+    {
+        return E_FAIL;
+    }
+
+    CloseHandle(pi.hProcess);
+    CloseHandle(pi.hThread);
+
     return S_OK;
 }
 
