@@ -30,3 +30,12 @@
 *.exe
 *.out
 *.app
+
+#
+src/.vs/
+src/packages/
+src/smb2tcp-client/x64/
+src/smb2tcp-common/x64/
+src/smb2tcp-server/x64/
+src/smb2tcp-tunnel/x64/
+src/x64/
