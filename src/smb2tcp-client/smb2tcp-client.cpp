@@ -2,49 +2,52 @@
 #pragma comment(lib, "Ws2_32.lib")
 
 #include <tcp.h>
-#include <iostream>
-#include <stdexcept>
 #include <smb2tcp-common.h>
 #include <pipe.h>
 #include <channel_client.h>
 #include <channel_server.h>
+#include <string>
+#include <vector>
+#include <iostream>
+#include <stdexcept>
 #include "rpc_client.h"
 
 #define PIPE_NAME_BUFFER_SIZE 1024
 #define ENCRYPTION_KEY_BUFFER_SIZE 1024
 
+struct Args
+{
+    std::string server;
+    std::string mode;
+    std::string listen_host;
+    std::string listen_port;
+    std::string connect_host;
+    std::string connect_port;
+};
+
+void parse_args(int argc, char* argv[], Args& args);
+
 int main(int argc, char* argv[])
 {
     try
     {
-        if (argc != 7)
-        {
-            throw std::invalid_argument("Invalid arguments");
-        }
+        Args args;
+        parse_args(argc, argv, args);
 
         winsock_init();
 
-        std::wstring server = str_to_wstr(argv[1]);
-        std::wstring mode = str_to_wstr(argv[2]);
-        std::string host_local = argv[3];
-        std::string port_local = argv[4];
-        std::wstring host_server = str_to_wstr(argv[5]);
-        std::wstring port_server = str_to_wstr(argv[6]);
-
-        if (mode != L"--local" && mode != L"--remote")
-        {
-            throw std::invalid_argument("Invalid mode. Use --local or --remote.");
-        }
-
+        std::wstring server = str_to_wstr(args.server);
         RpcClient rpc_client(server);
         wchar_t pipe_name[PIPE_NAME_BUFFER_SIZE] = { 0 };
         wchar_t encryption_key[ENCRYPTION_KEY_BUFFER_SIZE] = { 0 };
 
-        if (mode == L"--local")
+        if (args.mode == "local")
         {
+            std::wstring connect_host = str_to_wstr(args.connect_host);
+
             HRESULT hr = rpc_client.create_local_port_forwarding(
-                (wchar_t*)host_server.c_str(),
-                std::stoi(port_server),
+                (wchar_t*)connect_host.c_str(),
+                std::stoi(args.connect_port),
                 PIPE_NAME_BUFFER_SIZE,
                 pipe_name,
                 ENCRYPTION_KEY_BUFFER_SIZE,
@@ -57,11 +60,13 @@ int main(int argc, char* argv[])
                 throw std::runtime_error(msg);
             }
         }
-        else if (mode == L"--remote")
+        else if (args.mode == "remote")
         {
+            std::wstring listen_host = str_to_wstr(args.listen_host);
+
             HRESULT hr = rpc_client.create_remote_port_forwarding(
-                (wchar_t*)host_server.c_str(),
-                std::stoi(port_server),
+                (wchar_t*)listen_host.c_str(),
+                std::stoi(args.listen_port),
                 PIPE_NAME_BUFFER_SIZE,
                 pipe_name,
                 ENCRYPTION_KEY_BUFFER_SIZE,
@@ -79,14 +84,14 @@ int main(int argc, char* argv[])
         HANDLE pipe = create_pipe_client(full_pipe_name.c_str());
         wprintf(L"Connected to pipe server: %s\n", full_pipe_name.c_str());
 
-        if (mode == L"--local")
+        if (args.mode == "local")
         {
-            ChannelServer channel(pipe, host_local, port_local);
+            ChannelServer channel(pipe, args.listen_host, args.listen_port);
             channel.start();
         }
-        else if (mode == L"--remote")
+        else if (args.mode == "remote")
         {
-            ChannelClient channel(pipe, host_local, port_local);
+            ChannelClient channel(pipe, args.connect_host, args.connect_port);
             channel.start();
         }
 
@@ -97,4 +102,53 @@ int main(int argc, char* argv[])
         wprintf(L"Error: %S\n", e.what());
         exit(1);
     }
+}
+
+void parse_args(int argc, char* argv[], Args& args)
+{
+    if (argc < 4)
+    {
+        throw std::invalid_argument("Invalid arguments");
+    }
+
+    std::string arg = argv[1];
+    if (arg == "-L")
+    {
+        args.mode = "local";
+    }
+    else if (arg == "-R")
+    {
+        args.mode = "remote";
+    }
+    else
+    {
+        throw std::invalid_argument("Invalid mode. Use -L or -R.");
+    }
+
+    std::string address = argv[2];
+    size_t colon_pos = address.find(':');
+    if (colon_pos == std::string::npos)
+    {
+        throw std::invalid_argument("Invalid address format. Use <listen_host>:<listen_port>:<connect_host>:<connect_port> <server>.");
+    }
+    args.listen_host = address.substr(0, colon_pos);
+    address = address.substr(colon_pos + 1);
+
+    colon_pos = address.find(':');
+    if (colon_pos == std::string::npos)
+    {
+        throw std::invalid_argument("Invalid address format. Use <listen_host>:<listen_port>:<connect_host>:<connect_port>.");
+    }
+    args.listen_port = address.substr(0, colon_pos);
+    address = address.substr(colon_pos + 1);
+
+    colon_pos = address.find(':');
+    if (colon_pos == std::string::npos)
+    {
+        throw std::invalid_argument("Invalid address format. Use <listen_host>:<listen_port>:<connect_host>:<connect_port>.");
+    }
+    args.connect_host = address.substr(0, colon_pos);
+    args.connect_port = address.substr(colon_pos + 1);
+
+    args.server = argv[3];
 }
