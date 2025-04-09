@@ -7,9 +7,9 @@ On the server machine, run with any user:
 ```
 smb2tcp-server.exe
 ```
-On the client machine, for local port forwarding:
+On the client machine:
 ```
-smb2tcp-client.exe -L <listen_address>:<listen_port>:<connect_address>:<connect_port> <remote_machine>
+smb2tcp-client.exe -L|-R <listen_address>:<listen_port>:<connect_address>:<connect_port> <remote_machine>
 ```
 Examples:
 ```
