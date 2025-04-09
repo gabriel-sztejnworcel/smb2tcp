@@ -14,9 +14,7 @@ HRESULT RpcClient::create_local_port_forwarding(
     /* [string][in] */ wchar_t* connect_host,
     /* [in] */ int connect_port,
     /* [in] */ int pipe_name_size,
-    /* [string][size_is][out] */ wchar_t* pipe_name,
-    /* [in] */ int encryption_key_size,
-    /* [string][size_is][out] */ wchar_t* encryption_key)
+    /* [string][size_is][out] */ wchar_t* pipe_name)
 {
     HRESULT hr = S_OK;
 
@@ -27,9 +25,7 @@ HRESULT RpcClient::create_local_port_forwarding(
             connect_host,
             connect_port,
             pipe_name_size,
-            pipe_name,
-            encryption_key_size,
-            encryption_key
+            pipe_name
         );
     }
     __except (EXCEPTION_EXECUTE_HANDLER)
@@ -44,10 +40,7 @@ HRESULT RpcClient::create_remote_port_forwarding(
     /* [string][in] */ wchar_t* listen_host,
     /* [in] */ int listen_port,
     /* [in] */ int pipe_name_size,
-    /* [string][size_is][out] */ wchar_t* pipe_name,
-    /* [in] */ int encryption_key_size,
-    /* [string][size_is][out] */ wchar_t* encryption_key
-)
+    /* [string][size_is][out] */ wchar_t* pipe_name)
 {
     HRESULT hr = S_OK;
     
@@ -58,9 +51,7 @@ HRESULT RpcClient::create_remote_port_forwarding(
             listen_host,
             listen_port,
             pipe_name_size,
-            pipe_name,
-            encryption_key_size,
-            encryption_key
+            pipe_name
         );
     }
     __except (EXCEPTION_EXECUTE_HANDLER)

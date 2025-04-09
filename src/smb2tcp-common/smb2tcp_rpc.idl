@@ -10,17 +10,13 @@ interface smb2tcp_rpc
 		[in, string] wchar_t* connect_host,
 		[in] int connect_port,
 		[in] int pipe_name_size,
-		[out, size_is(pipe_name_size), string] wchar_t* pipe_name,
-		[in] int encryption_key_size,
-		[out, size_is(encryption_key_size), string] wchar_t* encryption_key
+		[out, size_is(pipe_name_size), string] wchar_t* pipe_name
 	);
 
 	HRESULT create_remote_port_forwarding(
 		[in, string] wchar_t* listen_host,
 		[in] int listen_port,
 		[in] int pipe_name_size,
-		[out, size_is(pipe_name_size), string] wchar_t* pipe_name,
-		[in] int encryption_key_size,
-		[out, size_is(encryption_key_size), string] wchar_t* encryption_key
+		[out, size_is(pipe_name_size), string] wchar_t* pipe_name
 	);
 };

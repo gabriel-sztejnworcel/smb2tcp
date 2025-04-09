@@ -53,9 +53,7 @@ HRESULT RpcServer::create_local_port_forwarding(
     /* [string][in] */ wchar_t* connect_host,
     /* [in] */ int connect_port,
     /* [in] */ int pipe_name_size,
-    /* [string][size_is][out] */ wchar_t* pipe_name,
-    /* [in] */ int encryption_key_size,
-    /* [string][size_is][out] */ wchar_t* encryption_key)
+    /* [string][size_is][out] */ wchar_t* pipe_name)
 {
     validate_host(connect_host);
     
@@ -68,8 +66,6 @@ HRESULT RpcServer::create_local_port_forwarding(
 
     wprintf(L"Received request to create local port forwarding: pipe_name=%s, connect_host=%s, connect_port=%d\n",
         pipe_name, connect_host, connect_port);
-
-    wcscpy_s(encryption_key, encryption_key_size, L"");
 
     if (FAILED(run_tunnel_process(full_pipe_name, L"--connect", connect_host, connect_port)))
     {
@@ -84,9 +80,7 @@ HRESULT RpcServer::create_remote_port_forwarding(
     /* [string][in] */ wchar_t* listen_host,
     /* [in] */ int listen_port,
     /* [in] */ int pipe_name_size,
-    /* [string][size_is][out] */ wchar_t* pipe_name,
-    /* [in] */ int encryption_key_size,
-    /* [string][size_is][out] */ wchar_t* encryption_key)
+    /* [string][size_is][out] */ wchar_t* pipe_name)
 {
     validate_host(listen_host);
     
@@ -99,8 +93,6 @@ HRESULT RpcServer::create_remote_port_forwarding(
 
     wprintf(L"Received request to create remote port forwarding: pipe_name=%s, listen_host=%s, listen_port=%d\n",
         pipe_name, listen_host, listen_port);
-
-    wcscpy_s(encryption_key, encryption_key_size, L"");
 
     if (FAILED(run_tunnel_process(full_pipe_name, L"--listen", listen_host, listen_port)))
     {
@@ -182,18 +174,14 @@ HRESULT s_create_local_port_forwarding(
     /* [string][in] */ wchar_t* connect_host,
     /* [in] */ int connect_port,
     /* [in] */ int pipe_name_size,
-    /* [string][size_is][out] */ wchar_t* pipe_name,
-    /* [in] */ int encryption_key_size,
-    /* [string][size_is][out] */ wchar_t* encryption_key)
+    /* [string][size_is][out] */ wchar_t* pipe_name)
 {
     return RpcServer::instance().create_local_port_forwarding(
         IDL_handle,
         connect_host,
         connect_port,
         pipe_name_size,
-        pipe_name,
-        encryption_key_size,
-        encryption_key
+        pipe_name
     );
 }
 
@@ -202,17 +190,13 @@ HRESULT s_create_remote_port_forwarding(
     /* [string][in] */ wchar_t* listen_host,
     /* [in] */ int listen_port,
     /* [in] */ int pipe_name_size,
-    /* [string][size_is][out] */ wchar_t* pipe_name,
-    /* [in] */ int encryption_key_size,
-    /* [string][size_is][out] */ wchar_t* encryption_key)
+    /* [string][size_is][out] */ wchar_t* pipe_name)
 {
     return RpcServer::instance().create_remote_port_forwarding(
         IDL_handle,
         listen_host,
         listen_port,
         pipe_name_size,
-        pipe_name,
-        encryption_key_size,
-        encryption_key
+        pipe_name
     );
 }

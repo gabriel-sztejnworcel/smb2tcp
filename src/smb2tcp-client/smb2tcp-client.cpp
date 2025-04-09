@@ -14,7 +14,6 @@
 #include "rpc_client.h"
 
 #define PIPE_NAME_BUFFER_SIZE 1024
-#define ENCRYPTION_KEY_BUFFER_SIZE 1024
 
 struct Args
 {
@@ -43,7 +42,6 @@ int main(int argc, char* argv[])
         std::wstring server = str_to_wstr(args.server);
         RpcClient rpc_client(server);
         wchar_t pipe_name[PIPE_NAME_BUFFER_SIZE] = { 0 };
-        wchar_t encryption_key[ENCRYPTION_KEY_BUFFER_SIZE] = { 0 };
 
         if (args.mode == "local")
         {
@@ -56,9 +54,7 @@ int main(int argc, char* argv[])
                 (wchar_t*)connect_host.c_str(),
                 std::stoi(args.connect_port),
                 PIPE_NAME_BUFFER_SIZE,
-                pipe_name,
-                ENCRYPTION_KEY_BUFFER_SIZE,
-                encryption_key
+                pipe_name
             );
 
             if (FAILED(hr))
@@ -78,9 +74,7 @@ int main(int argc, char* argv[])
                 (wchar_t*)listen_host.c_str(),
                 std::stoi(args.listen_port),
                 PIPE_NAME_BUFFER_SIZE,
-                pipe_name,
-                ENCRYPTION_KEY_BUFFER_SIZE,
-                encryption_key
+                pipe_name
             );
 
             if (FAILED(hr))

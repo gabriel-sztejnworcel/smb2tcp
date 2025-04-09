@@ -102,7 +102,7 @@ void ChannelBase::handle_channel_data(TunnelMessage* message)
         tcp_write_context.bytes = (DWORD)message->header.len;
         tcp_send(&tcp_write_context);
     }
-    catch (std::exception& e)
+    catch (std::exception&)
     {
         wprintf(L"Closing socket: client_id=%d\n", message->header.client_id);
         destroy_channel(message->header.client_id, message->header.client_id, true);
