@@ -6,7 +6,7 @@
 struct PipeContext
 {
     HANDLE pipe;
-    char buffer[TUNNEL_BUFFER_SIZE];
+    char buffer[TUNNEL_ENCRYPTED_BUFFER_SIZE];
     DWORD bytes;
     DWORD bytes_read;
     DWORD bytes_written;

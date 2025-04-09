@@ -27,6 +27,7 @@ struct TunnelMessage
 };
 
 #define TUNNEL_BUFFER_SIZE sizeof(TunnelMessage)
+#define TUNNEL_ENCRYPTED_BUFFER_SIZE TUNNEL_BUFFER_SIZE + 32
 
 std::wstring str_to_wstr(const std::string& str);
 void print_hex_dump(BYTE* buffer, DWORD length);

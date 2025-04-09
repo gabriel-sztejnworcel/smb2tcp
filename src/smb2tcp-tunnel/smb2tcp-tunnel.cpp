@@ -1,4 +1,5 @@
 #pragma comment(lib, "Ws2_32.lib")
+#pragma comment(lib, "bcrypt.lib")
 
 #include <tcp.h>
 #include <iostream>
@@ -40,14 +41,16 @@ int main(int argc, char* argv[])
         wait_for_client(pipe);
         wprintf(L"Client connected\n");
 
+        std::string encryption_key = "11111111111111111111111111111111";
+        
         if (mode == "--listen")
         {
-            ChannelServer channel_server(pipe, host, port);
+            ChannelServer channel_server(pipe, host, port, (const BYTE*)encryption_key.c_str(), (ULONG)encryption_key.length());
             channel_server.start();
         }
         else if (mode == "--connect")
         {
-            ChannelClient channel_client(pipe, host, port);
+            ChannelClient channel_client(pipe, host, port, (const BYTE*)encryption_key.c_str(), (ULONG)encryption_key.length());
             channel_client.start();
         }
 

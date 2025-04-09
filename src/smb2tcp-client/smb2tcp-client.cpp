@@ -1,5 +1,6 @@
 #pragma comment(lib, "Rpcrt4.lib")
 #pragma comment(lib, "Ws2_32.lib")
+#pragma comment(lib, "bcrypt.lib")
 
 #include <tcp.h>
 #include <smb2tcp-common.h>
@@ -94,14 +95,16 @@ int main(int argc, char* argv[])
         HANDLE pipe = create_pipe_client(full_pipe_name.c_str());
         wprintf(L"Connected to pipe server: %s\n", full_pipe_name.c_str());
 
+        std::string hc_encryption_key = "11111111111111111111111111111111";
+
         if (args.mode == "local")
         {
-            ChannelServer channel_server(pipe, args.listen_host, args.listen_port);
+            ChannelServer channel_server(pipe, args.listen_host, args.listen_port, (const BYTE*)hc_encryption_key.c_str(), (ULONG)hc_encryption_key.length());
             channel_server.start();
         }
         else if (args.mode == "remote")
         {
-            ChannelClient channel_client(pipe, args.connect_host, args.connect_port);
+            ChannelClient channel_client(pipe, args.connect_host, args.connect_port, (const BYTE*)hc_encryption_key.c_str(), (ULONG)hc_encryption_key.length());
             channel_client.start();
         }
 

@@ -1,8 +1,8 @@
 #include "channel_client.h"
 #include <thread>
 
-ChannelClient::ChannelClient(HANDLE pipe, const std::string& host, const std::string& port)
-    : ChannelBase(pipe, host, port)
+ChannelClient::ChannelClient(HANDLE pipe, const std::string& host, const std::string& port, const BYTE* key, ULONG key_len)
+    : ChannelBase(pipe, host, port, key, key_len)
 {
 
 }

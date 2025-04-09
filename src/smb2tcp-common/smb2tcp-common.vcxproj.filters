@@ -39,6 +39,9 @@
     <ClCompile Include="clientstub.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="crypt.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tcp.h">
@@ -57,6 +60,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="smb2tcp-common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="crypt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

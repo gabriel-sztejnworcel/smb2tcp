@@ -5,7 +5,7 @@
 class ChannelClient : public ChannelBase
 {
 public:
-    ChannelClient(HANDLE pipe, const std::string& host, const std::string& port);
+    ChannelClient(HANDLE pipe, const std::string& host, const std::string& port, const BYTE* key, ULONG key_len);
     void start();
 
 protected:

@@ -1,12 +1,13 @@
 #include "channel_base.h"
 #include "pipe.h"
+#include "crypt.h"
 #include <stdexcept>
 #include <mutex>
 
-ChannelBase::ChannelBase(HANDLE pipe, const std::string& host, const std::string& port)
+ChannelBase::ChannelBase(HANDLE pipe, const std::string& host, const std::string& port, const BYTE* key, ULONG key_len)
     : pipe_(pipe), host_(host), port_(port)
 {
-
+    bcrypt_create_aes_key(key, key_len, &encryption_key_, &alg_handle_);
 }
 
 void ChannelBase::pipe_thread_fn()
@@ -21,19 +22,32 @@ void ChannelBase::pipe_thread_fn()
             pipe_read_context.pipe = pipe_.get();
 
             pipe_read_async_await(&pipe_read_context);
-            TunnelMessage* message = (TunnelMessage*)pipe_read_context.buffer;
-            switch (message->header.type)
+
+            // TunnelMessage* message = (TunnelMessage*)pipe_read_context.buffer;
+
+            TunnelMessage message;
+            ZeroMemory(&message, sizeof(message));
+
+            bcrypt_aes_decrypt_data(
+                (const BYTE*)pipe_read_context.buffer,
+                pipe_read_context.bytes_read,
+                encryption_key_.get(),
+                (BYTE*) & message,
+                TUNNEL_BUFFER_SIZE
+            );
+
+            switch (message.header.type)
             {
             case TunnelMessageType::CONNECT:
-                handle_channel_connect(message);
+                handle_channel_connect(&message);
                 break;
 
             case TunnelMessageType::DISCONNECT:
-                handle_channel_disconnect(message);
+                handle_channel_disconnect(&message);
                 break;
 
             case TunnelMessageType::DATA:
-                handle_channel_data(message);
+                handle_channel_data(&message);
                 break;
 
             default:
@@ -68,14 +82,32 @@ void ChannelBase::tcp_thread_fn(SOCKET client_socket, uint32_t client_id)
             PipeContext pipe_write_context = { 0 };
             pipe_write_context.pipe = pipe_.get();
 
-            TunnelMessage* tunnel_message = (TunnelMessage*)pipe_write_context.buffer;
-            ZeroMemory(tunnel_message, TUNNEL_BUFFER_SIZE);
-            tunnel_message->header.type = TunnelMessageType::DATA;
-            tunnel_message->header.client_id = tcp_read_context.client_id;
-            tunnel_message->header.len = tcp_read_context.bytes_read;
-            memcpy(tunnel_message->buffer, tcp_read_context.buffer, tunnel_message->header.len);
+            //TunnelMessage* tunnel_message = (TunnelMessage*)pipe_write_context.buffer;
+            //ZeroMemory(tunnel_message, TUNNEL_BUFFER_SIZE);
+            //tunnel_message->header.type = TunnelMessageType::DATA;
+            //tunnel_message->header.client_id = tcp_read_context.client_id;
+            //tunnel_message->header.len = tcp_read_context.bytes_read;
+            //memcpy(tunnel_message->buffer, tcp_read_context.buffer, tunnel_message->header.len);
 
-            pipe_write_context.bytes = (DWORD)(sizeof(TunnelMessageHeader) + tunnel_message->header.len);
+            //pipe_write_context.bytes = (DWORD)(sizeof(TunnelMessageHeader) + tunnel_message->header.len);
+
+            TunnelMessage tunnel_message;
+            ZeroMemory(&tunnel_message, TUNNEL_BUFFER_SIZE);
+            tunnel_message.header.type = TunnelMessageType::DATA;
+            tunnel_message.header.client_id = tcp_read_context.client_id;
+            tunnel_message.header.len = tcp_read_context.bytes_read;
+            memcpy(tunnel_message.buffer, tcp_read_context.buffer, tunnel_message.header.len);
+
+            ULONG ciphertext_size = bcrypt_aes_encrypt_data(
+                (const BYTE*) & tunnel_message,
+                (ULONG)(sizeof(TunnelMessageHeader) + tunnel_message.header.len),
+                &encryption_key_,
+                (BYTE*)pipe_write_context.buffer,
+                TUNNEL_ENCRYPTED_BUFFER_SIZE
+            );
+
+            pipe_write_context.bytes = ciphertext_size;
+
             pipe_write_async_await(&pipe_write_context);
         }
     }
@@ -102,7 +134,7 @@ void ChannelBase::handle_channel_data(TunnelMessage* message)
         tcp_write_context.bytes = (DWORD)message->header.len;
         tcp_send(&tcp_write_context);
     }
-    catch (std::exception& e)
+    catch (std::exception&)
     {
         wprintf(L"Closing socket: client_id=%d\n", message->header.client_id);
         destroy_channel(message->header.client_id, message->header.client_id, true);
@@ -116,13 +148,30 @@ void ChannelBase::destroy_channel(SOCKET client_socket, uint32_t client_id, bool
         PipeContext pipe_write_context = { 0 };
         pipe_write_context.pipe = pipe_.get();
 
-        TunnelMessage* tunnel_message = (TunnelMessage*)pipe_write_context.buffer;
-        ZeroMemory(tunnel_message, TUNNEL_BUFFER_SIZE);
-        tunnel_message->header.type = TunnelMessageType::DISCONNECT;
-        tunnel_message->header.client_id = client_id;
-        tunnel_message->header.len = 0;
+        //TunnelMessage* tunnel_message = (TunnelMessage*)pipe_write_context.buffer;
+        //ZeroMemory(tunnel_message, TUNNEL_BUFFER_SIZE);
+        //tunnel_message->header.type = TunnelMessageType::DISCONNECT;
+        //tunnel_message->header.client_id = client_id;
+        //tunnel_message->header.len = 0;
 
-        pipe_write_context.bytes = (DWORD)sizeof(TunnelMessageHeader);
+        //pipe_write_context.bytes = (DWORD)sizeof(TunnelMessageHeader);
+
+        TunnelMessage tunnel_message;
+        ZeroMemory(&tunnel_message, TUNNEL_BUFFER_SIZE);
+        tunnel_message.header.type = TunnelMessageType::DISCONNECT;
+        tunnel_message.header.client_id = client_id;
+        tunnel_message.header.len = 0;
+
+        ULONG ciphertext_size = bcrypt_aes_encrypt_data(
+            (const BYTE*)&tunnel_message,
+            (ULONG)(sizeof(TunnelMessageHeader) + tunnel_message.header.len),
+            &encryption_key_,
+            (BYTE*)pipe_write_context.buffer,
+            TUNNEL_ENCRYPTED_BUFFER_SIZE
+        );
+
+        pipe_write_context.bytes = ciphertext_size;
+
         pipe_write_async_await(&pipe_write_context);
     }
     

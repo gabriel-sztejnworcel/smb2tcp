@@ -5,7 +5,7 @@
 class ChannelServer : public ChannelBase
 {
 public:
-    ChannelServer(HANDLE pipe, const std::string& host, const std::string& port);
+    ChannelServer(HANDLE pipe, const std::string& host, const std::string& port, const BYTE* key, ULONG key_len);
     void start();
 
 protected:

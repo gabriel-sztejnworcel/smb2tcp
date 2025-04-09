@@ -12,7 +12,7 @@
 class ChannelBase
 {
 protected:
-    ChannelBase(HANDLE pipe, const std::string& host, const std::string& port);
+    ChannelBase(HANDLE pipe, const std::string& host, const std::string& port, const BYTE* key, ULONG key_len);
     virtual ~ChannelBase() = default;
 
     void pipe_thread_fn();
@@ -32,6 +32,8 @@ protected:
     wil::unique_handle pipe_;
     std::string host_;
     std::string port_;
+    wil::unique_bcrypt_key encryption_key_;
+    wil::unique_bcrypt_algorithm alg_handle_;
 
 private:
     std::unordered_map<uint32_t, TcpContext> tcp_write_contexts_;

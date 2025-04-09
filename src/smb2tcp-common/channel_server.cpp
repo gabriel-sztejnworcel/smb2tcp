@@ -2,8 +2,8 @@
 #include "pipe.h"
 #include <thread>
 
-ChannelServer::ChannelServer(HANDLE pipe, const std::string& host, const std::string& port)
-    : ChannelBase(pipe, host, port)
+ChannelServer::ChannelServer(HANDLE pipe, const std::string& host, const std::string& port, const BYTE* key, ULONG key_len)
+    : ChannelBase(pipe, host, port, key, key_len)
 {
 
 }

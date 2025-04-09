@@ -23,12 +23,14 @@
     <ClCompile Include="channel_client.cpp" />
     <ClCompile Include="channel_server.cpp" />
     <ClCompile Include="clientstub.c" />
+    <ClCompile Include="crypt.cpp" />
     <ClCompile Include="pipe.cpp" />
     <ClCompile Include="serverstub.c" />
     <ClCompile Include="smb2tcp-common.cpp" />
     <ClCompile Include="tcp.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="crypt.h" />
     <ClInclude Include="channel_client.h" />
     <ClInclude Include="channel_base.h" />
     <ClInclude Include="channel_server.h" />
