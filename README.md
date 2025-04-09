@@ -29,4 +29,4 @@ cmd> smb2tcp-client.exe -L <listen_address>:<listen_port>:<connect_address>:<con
 ## Current Limitations
 - No application level encryption: The tunnel will be encrypted by SMB only if both sides will agree on encryption, the data in the tunnel will be encrypted only if you are using an encrypted protocol (HTTPS, SSH, RDP over TLS), otherwise there will be no encryption. I'm working on application level encryption using BCrypt.
 - Default security descriptors: The tool consists of an RPC server over a named pipe as the control plane, and the named pipes tunnels. For both, I use the default security descriptors, which might be too permissive.
-- Performance: Currently the performance is not optimal due to the use of synchronous IO.
+- Performance: Currently the performance is not optimal due to the use of synchronous IO, so you might exprience slowness with "heavy" protocols such as RDP. Hopefully this will improve with overlapped IO.
