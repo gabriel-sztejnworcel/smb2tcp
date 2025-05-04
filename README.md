@@ -7,7 +7,7 @@ On the server machine, run with any user:
 ```
 smb2tcp-server.exe
 ```
-You need to make sure that smb2tcp-tunnnel.exe and smb2tcp-server.exe are in the same folder.
+You need to make sure that smb2tcp-tunnel.exe and smb2tcp-server.exe are in the same folder.
 
 On the client machine:
 ```
