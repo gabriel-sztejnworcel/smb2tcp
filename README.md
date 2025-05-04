@@ -7,6 +7,7 @@ On the server machine, run with any user:
 ```
 smb2tcp-server.exe
 ```
+You need to make sure that smb2tcp-tunnnel.exe is on the same folder as smb2tcp-server.exe
 On the client machine:
 ```
 smb2tcp-client.exe -L|-R <listen_address>:<listen_port>:<connect_address>:<connect_port> <remote_machine>
